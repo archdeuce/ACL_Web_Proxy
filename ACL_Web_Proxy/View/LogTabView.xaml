@@ -1,0 +1,184 @@
+﻿<UserControl
+    x:Class="ACL_Web_Proxy.View.LogTabView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="600"
+    d:DesignWidth="850"
+    DataContext="{Binding LogTabViewModel, Source={StaticResource Locator}}"
+    mc:Ignorable="d">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <UserControl.Resources>
+        <!--  Настройки ячеек датагрида  -->
+        <Style TargetType="DataGridCell">
+            <Setter Property="Focusable" Value="True" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#0070D1" />
+
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#99FFCCCC" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--  Настройки кнопок  -->
+        <Style TargetType="Button">
+            <Setter Property="Foreground" Value="Black" />
+            <Style.Triggers>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Foreground" Value="Orange" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--  Установка фокуса на поле ввода  -->
+        <Style x:Key="focusTextBox" TargetType="TextBox">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=searchTB, Path=IsVisible}" Value="True">
+                    <Setter Property="FocusManager.FocusedElement" Value="{Binding ElementName=searchTB}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="7px" />
+            <RowDefinition Height="30px" />
+            <RowDefinition Height="7px" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="7px" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7px" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="7px" />
+        </Grid.ColumnDefinitions>
+
+        <!--  Поле фильтрации  -->
+        <TextBox
+            x:Name="searchTB"
+            Grid.Row="1"
+            Grid.Column="1"
+            Grid.ColumnSpan="7"
+            Padding="2,0,0,0"
+            VerticalContentAlignment="Center"
+            Focusable="True"
+            FontSize="16"
+            Foreground="#0070D1"
+            Style="{StaticResource focusTextBox}"
+            Text="{Binding Path=Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="NoWrap">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding SearchCommand}" />
+                <MouseBinding Command="{Binding SearchTextBoxCommand}" MouseAction="LeftDoubleClick" />
+            </TextBox.InputBindings>
+        </TextBox>
+
+        <!--  Количество отображаемых записей  -->
+        <ComboBox
+            Grid.Row="1"
+            Grid.Column="8"
+            Margin="2,0,0,0"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            FontSize="16"
+            ItemsSource="{Binding LineNumbers}"
+            SelectedValue="{Binding Path=SelectedLines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding SearchCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+
+        <!--  Кнопка фильтрации  -->
+        <Button
+            Grid.Row="1"
+            Grid.Column="9"
+            Grid.ColumnSpan="2"
+            Margin="2,0,0,0"
+            Command="{Binding SearchCommand}"
+            Content="Search" />
+
+        <!--  Датагрид с сотрудниками  -->
+        <DataGrid
+            x:Name="logDG"
+            Grid.Row="3"
+            Grid.RowSpan="9"
+            Grid.Column="1"
+            Grid.ColumnSpan="10"
+            Padding="3"
+            HorizontalContentAlignment="Center"
+            AutoGenerateColumns="False"
+            Background="White"
+            ColumnWidth="*"
+            FontSize="14"
+            Foreground="#D4FF3155"
+            GridLinesVisibility="None"
+            HeadersVisibility="Column"
+            HorizontalScrollBarVisibility="Disabled"
+            IsReadOnly="True"
+            ItemsSource="{Binding DbLogs}"
+            SelectionMode="Single"
+            SelectionUnit="CellOrRowHeader">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Width="140"
+                    Binding="{Binding StringFormat=yyyy/MM/dd HH:mm:ss, Path=EventDate}"
+                    Header="Date" />
+                <DataGridTextColumn
+                    Width="70"
+                    Binding="{Binding Executor}"
+                    Header="Executor" />
+                <DataGridTextColumn
+                    Width="150"
+                    Binding="{Binding Employee}"
+                    Header="Employee" />
+                <DataGridTextColumn Binding="{Binding Operation}" Header="Operation" />
+                <DataGridTextColumn
+                    Width="120"
+                    Binding="{Binding Host}"
+                    Header="Hostname" />
+                <DataGridTextColumn
+                    Width="100"
+                    Binding="{Binding StringFormat=yyyy/MM/dd, Path=ExpireDate}"
+                    Header="Expired" />
+            </DataGrid.Columns>
+
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="Copy" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
+    </Grid>
+</UserControl>
