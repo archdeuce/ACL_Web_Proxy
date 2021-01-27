@@ -392,7 +392,19 @@ namespace ACL_Web_Proxy.ViewModel
             string resultMsg = string.Empty;
             string notFound = string.Empty;
             List<Employee> ignoredList = new List<Employee>();
-            List<Employee> userInputEmployeesList = this.parser.GetEmployeesList(this.UserInput);
+            List<Employee> userInputEmployeesList = new List<Employee>();
+
+            if (this.UserInput.Contains('@'))
+            {
+                // Нужно сделать перебор по эмейлам
+                userInputEmployeesList = this.parser.GetEmployeesListByEmail(this.UserInput);
+            }
+            else 
+            { 
+                // Иначе поиск по именам
+                 userInputEmployeesList = this.parser.GetEmployeesListByName(this.UserInput);
+            }
+
 
             // Начинаем перебор сотрудников из введенного пользователем списка
             foreach (Employee inputUser in userInputEmployeesList)
@@ -403,7 +415,8 @@ namespace ACL_Web_Proxy.ViewModel
                 foreach (Employee adUser in this.AdEmployees)
                 {
                     if ((inputUser.FirstName == adUser.FirstName && inputUser.LastName == adUser.LastName) ||
-                         (inputUser.FirstName == adUser.LastName && inputUser.LastName == adUser.FirstName))
+                         (inputUser.FirstName == adUser.LastName && inputUser.LastName == adUser.FirstName) || 
+                         (inputUser.PrincipalName == adUser.PrincipalName))
                     {
                         if (adUser.ExpireDate == null || this.SelectedDate.Date > adUser.ExpireDate)
                         {
@@ -429,7 +442,8 @@ namespace ACL_Web_Proxy.ViewModel
                 foreach (Employee adUser in this.AdEmployeesGeocoders)
                 {
                     if ((inputUser.FirstName == adUser.FirstName && inputUser.LastName == adUser.LastName) ||
-                         (inputUser.FirstName == adUser.LastName && inputUser.LastName == adUser.FirstName))
+                         (inputUser.FirstName == adUser.LastName && inputUser.LastName == adUser.FirstName) ||
+                         (inputUser.PrincipalName == adUser.PrincipalName))
                     {
                         if (adUser.ExpireDate == null || this.SelectedDate.Date > adUser.ExpireDate)
                         {
